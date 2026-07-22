@@ -1,0 +1,6 @@
+{
+  "name": "Doc Plus Dermatology Portal",
+  "description": "A premium dermatologist clinic platform featuring an interactive booking system, a comprehensive patient portal for treatment tracking, and detailed descriptions of professional skin care treatments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
