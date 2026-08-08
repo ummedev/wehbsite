@@ -134,7 +134,7 @@ export const TREATMENTS: Treatment[] = [
     fullDescription: "Atopic dermatitis and eczema are triggered by immune dysfunction and a compromised epidermal barrier. Dr. Faisal Ahmed designs localized steroid-sparing immunosuppressants, medical wet-wraps, and lipid-replenishing barrier formulas to eliminate cellular inflammation and secure cellular hydration.",
     duration: "30 mins",
     price: "Rs. 4,000",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
+    image: "/src/assets/images/derma_treatment_editorial_1784620902611.jpg",
     benefits: [
       "Immediately relieves intense, sleep-disrupting itching",
       "Restores essential ceramides to repair cracked epidermal skin",
@@ -152,141 +152,6 @@ export const TREATMENTS: Treatment[] = [
     faqs: [
       { q: "Is this treatment safe for long term use?", a: "Yes. We avoid long-term potent topical steroids, focusing instead on immunomodulating topicals and barrier-building lipids." },
       { q: "Can eczema be cured?", a: "While eczema is a chronic condition, our customized protocol can maintain perfect, flare-free skin for years." }
-    ]
-  },
-  {
-    id: "psoriasis-therapy",
-    name: "Chronic Psoriasis Care",
-    category: "medical",
-    shortDescription: "Specialized dermatologist care managing systemic plaques, scaling, and skin cell hyper-proliferation.",
-    fullDescription: "Psoriasis causes skin cells to multiply up to 10 times faster than normal, building up into bumpy red plaques covered with silvery scales. We offer complete clinical management including systemic biological therapies, highly effective coal tar compounds, and localized corticosteroid monitoring.",
-    duration: "40 mins",
-    price: "Rs. 4,500",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
-    benefits: [
-      "Fades plaques and reduces thick, silvery scaling",
-      "Controls over-proliferation of surface skin cells",
-      "Relieves joint soreness associated with psoriatic symptoms",
-      "Improves overall aesthetic quality of affected skin areas"
-    ],
-    procedureSteps: [
-      "Plaque thickness and body surface area assessment",
-      "Keratolytic preparation to gently remove stubborn build-up scales",
-      "Targeted systemic dosage tailoring or highly focused topical dressing",
-      "Long-term wellness charting and dietetic advice"
-    ],
-    skinTypes: ["Dry", "Thick", "Inflamed"],
-    recovery: "Immediate reduction in scaling. Redness resolves gradually over 2-3 weeks.",
-    faqs: [
-      { q: "Are biological injectables available?", a: "Yes, Dr. Faisal Ahmed provides counseling and clinical prescribing of modern biological treatments for severe cases." }
-    ]
-  },
-  {
-    id: "fungal-infections",
-    name: "Medical Anti-Fungal Therapy",
-    category: "medical",
-    shortDescription: "Rapid clinical treatment for ringworm, tinea versicolor, nail fungus, and candidiasis infections.",
-    fullDescription: "Fungal infections can be incredibly persistent, especially in hot, humid climates. We provide precise skin scrapings and microscopic examinations to identify the exact fungal strain, allowing us to prescribe highly targeted medical antifungals and antifungal therapeutic washes.",
-    duration: "30 mins",
-    price: "Rs. 3,500",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
-    benefits: [
-      "Stops fungal growth and spreading instantly",
-      "Eradicates itching, peeling, and skin discolorations",
-      "Restores even skin color on discolored patches",
-      "Provides complete clearance of deep nail fungus beds"
-    ],
-    procedureSteps: [
-      "Clinical skin scraping and KOH preparation microscopy",
-      "Targeted disinfection of active skin regions",
-      "Prescription of combined systemic and high-strength topical azoles",
-      "In-depth patient hygiene guidance to prevent recurrences"
-    ],
-    skinTypes: ["All Skin Types"],
-    recovery: "Symptom relief within 48 hours. Full clearing depends on infection type (2-4 weeks for skin, longer for nails).",
-    faqs: [
-      { q: "Why does my fungal infection keep coming back?", a: "Infections recur if spores remain in shoes, clothes, or the skin barrier isn't fully treated. We ensure complete eradication." }
-    ]
-  },
-  {
-    id: "skin-allergies",
-    name: "Allergy Testing & Relief",
-    category: "medical",
-    shortDescription: "Expert diagnosis and clinical treatments for contact dermatitis, hives, and chronic urticaria.",
-    fullDescription: "When skin reacts to cosmetics, fragrances, metals, or fabrics, determining the allergen is crucial. We offer clinical diagnosis, patch testing referrals, and intensive soothing therapies to calm active skin hypersensitivity, swelling, and hives.",
-    duration: "30 mins",
-    price: "Rs. 3,800",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
-    benefits: [
-      "Stops severe allergic itching and skin hives rapidly",
-      "Identifies the precise environmental or chemical triggers",
-      "Soothes severe hives and swelling with intravenous antihistamines if required",
-      "Creates a safe skin-care routine free of irritating ingredients"
-    ],
-    procedureSteps: [
-      "Comprehensive patient lifestyle and contact allergen audit",
-      "Application of cooling, anti-inflammatory therapeutic compresses",
-      "Administration of non-sedating medical anti-histaminic therapies",
-      "Provision of an 'Allergy-Safe' list of clinical soaps and moisturizers"
-    ],
-    skinTypes: ["Allergic", "Reactive", "Highly Sensitive"],
-    recovery: "Hives and acute swelling typically settle within 12-24 hours.",
-    faqs: [
-      { q: "Can I use make-up after an allergic reaction?", a: "We advise pausing all cosmetics for 72 hours until the barrier fully seals, and then introducing approved hypoallergenic items." }
-    ]
-  },
-  {
-    id: "warts-removal",
-    name: "Clinical Cryotherapy for Warts",
-    category: "medical",
-    shortDescription: "Instant cryo-ablation and radiofrequency treatment to safely eliminate viral warts.",
-    fullDescription: "Warts are caused by the HPV virus on the skin surface. We offer quick, clinical cryotherapy (liquid nitrogen freezing) and radiofrequency electro-cautery to permanently ablate wart tissues. This prevents spreading and guarantees clean aesthetic healing.",
-    duration: "20 mins",
-    price: "Rs. 4,500",
-    image: "/src/assets/images/laser_procedure_1784603065821.jpg",
-    benefits: [
-      "Provides immediate, sterile removal of viral lesions",
-      "Minimizes the risk of viral spreading to other body parts",
-      "Extremely quick procedure requiring zero surgical stitches",
-      "Virtually zero scar formation when handled by Dr. Ayesha Malik"
-    ],
-    procedureSteps: [
-      "Surgical sterilization of the treatment area",
-      "Targeted application of liquid nitrogen gas or radiofrequency loop",
-      "Excision of necrotic tissue under local anesthetic if necessary",
-      "Application of medical antibiotic sealants"
-    ],
-    skinTypes: ["All Skin Types"],
-    recovery: "Mild blistering may occur at the treated site, which drys and falls off in 5-7 days. Keep dry and bandaged.",
-    faqs: [
-      { q: "Does the cryotherapy freeze hurt?", a: "You will feel an intense cold pinch for about 10-15 seconds. It is highly tolerable and very fast." }
-    ]
-  },
-  {
-    id: "moles-evaluation",
-    name: "Mole Mapping & Radiofrequency Removal",
-    category: "medical",
-    shortDescription: "Clinical mapping of moles and safe aesthetic removal using radiofrequency surgical loops.",
-    fullDescription: "Moles should always be evaluated under a dermatoscope. We provide clinical screening for irregular moles and offer highly precise aesthetic removal using radiofrequency ablation, ensuring zero stitching and minimal downtime.",
-    duration: "20 mins",
-    price: "Rs. 6,000",
-    image: "/src/assets/images/laser_procedure_1784603065821.jpg",
-    benefits: [
-      "Provides medical evaluation of mole borders for safety",
-      "Delivers absolute flat, scarless removal of raised moles",
-      "Utilizes radiofrequency loops that seal blood vessels instantly",
-      "Extremely comfortable with local numbing injections"
-    ],
-    procedureSteps: [
-      "Dermatoscopic digital mole-border mapping",
-      "Infusion of a tiny local anesthetic under the mole",
-      "Precise radiofrequency shaving or surgical flat-excision",
-      "Pathology referral for biopsy if any atypical features are detected"
-    ],
-    skinTypes: ["All Skin Types"],
-    recovery: "A small pink spot will remain for 7-10 days, healing into normal skin. Apply medical-grade ointment daily.",
-    faqs: [
-      { q: "Will the mole grow back?", a: "If the base cells are completely shaved off using radiofrequency, the mole is permanently removed in 98% of cases." }
     ]
   },
 
@@ -321,42 +186,14 @@ export const TREATMENTS: Treatment[] = [
     beforeAfterImage: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?q=80&w=600&h=400&fit=crop"
   },
   {
-    id: "dermal-fillers",
-    name: "Aesthetic Dermal Fillers",
-    category: "cosmetic",
-    shortDescription: "Premium hyaluronic acid fillers to restore volume to lips, cheeks, and jawlines.",
-    fullDescription: "As the skin ages, it loses critical structural fat, collagen, and bone support. We utilize world-class, cohesive hyaluronic acid dermal fillers (Juvederm and Restylane) to restore natural cheek contours, plump deflated lip structures, and sculpt sharp jawlines instantly.",
-    duration: "45 mins",
-    price: "Rs. 38,000",
-    image: "/src/assets/images/facial_procedure_1784603091197.jpg",
-    benefits: [
-      "Instantly plumps thin lips, restoring symmetrical contours",
-      "Lifts sagging cheeks and softens deep nasolabial laugh lines",
-      "Provides structured, sharp definition to chin and jawlines",
-      "Intensifies skin hydration due to water-binding hyaluronic acid"
-    ],
-    procedureSteps: [
-      "Facial proportion assessment and volume calculation",
-      "Application of medical numbing gel and mapping of critical blood vessels",
-      "Precise injection of filler material using a sterile blunt cannula",
-      "Gentle modeling of filler to ensure perfectly smooth contours"
-    ],
-    skinTypes: ["All Skin Types", "Mature", "Dry"],
-    recovery: "Very minimal swelling or minor bruising for 2-3 days. Avoid strenuous exercises and steam rooms for 48 hours.",
-    faqs: [
-      { q: "Is the filler permanent?", a: "No, hyaluronic acid fillers are completely biocompatible and slowly dissolve over 9 to 15 months." },
-      { q: "What if I do not like the result?", a: "Hyaluronic acid is completely reversible. We can instantly dissolve it using a specialized enzyme called Hyaluronidase." }
-    ]
-  },
-  {
     id: "premium-hydrafacial",
-    name: "Premium Hydrafacial & Infusion",
+    name: "Premium Hydrafacial & Glow Care",
     category: "cosmetic",
     shortDescription: "A multi-step medical facial that deeply cleanses, extracts impurities, and hydrates the skin.",
     fullDescription: "The Hydrafacial procedure uses a patented vortex-fusion delivery system to exfoliate, extract, and hydrate skin simultaneously. Our clinic enhances this standard treatment by infusing personalized, dermatologist-selected antioxidant serums, hyaluronic acids, and peptides tailored to your specific skin concerns.",
     duration: "60 mins",
     price: "Rs. 8,500",
-    image: "/src/assets/images/facial_procedure_1784603091197.jpg",
+    image: "/src/assets/images/dermatology_hero_1784619861658.jpg",
     benefits: [
       "Instantly extracts blackheads, whiteheads, and deep sebum",
       "Imbues intense hydration leaving a dewy, glowing finish",
@@ -376,60 +213,6 @@ export const TREATMENTS: Treatment[] = [
     ]
   },
   {
-    id: "chemical-peels",
-    name: "Advanced Aesthetic Peels",
-    category: "cosmetic",
-    shortDescription: "Dermatologist-formulated chemical peels to brighten skin, treat active acne, and reverse sun damage.",
-    fullDescription: "We offer customized chemical resurfacing peels (including Glycolic Acid, Salicylic Acid, TCA, and Yellow Peels) that gently remove dry, damaged outer skin layers. This triggers active cell renewal, uncovering a fresh, perfectly clear, and radiant complexion beneath.",
-    duration: "30 mins",
-    price: "Rs. 6,000",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
-    benefits: [
-      "Rapidly clears active acne lesions and reduces future breakouts",
-      "Significantly fades melasma, dark spots, and sun freckles",
-      "Enhances cellular turnover rate for fresh skin texture",
-      "Customizable strength levels based on skin tolerance"
-    ],
-    procedureSteps: [
-      "Double-cleansing and priming with a sebum-balancing solution",
-      "Controlled application of the selected peel agent by Dr. Malik",
-      "Neutralization and monitoring of skin response",
-      "Application of hydrating skin-barrier recovery balm"
-    ],
-    skinTypes: ["Oily", "Acne-Prone", "Dull", "Hyperpigmented"],
-    recovery: "Superficial flaking or peeling starting on day 3, finishing by day 6. Do not pull or scratch peeling skin.",
-    faqs: [
-      { q: "Is a chemical peel safe for dark Pakistani skin tones?", a: "Yes. Dr. Ayesha Malik carefully adjusts the depth and pH of the peels to prevent post-inflammatory hyperpigmentation (PIH)." }
-    ]
-  },
-  {
-    id: "microneedling-collagen",
-    name: "Microneedling & Growth Factors",
-    category: "cosmetic",
-    shortDescription: "Clinical microneedling using sterile cartridges to infuse growth factors, repairing scars and pores.",
-    fullDescription: "We utilize medical-grade automated microneedling pens (Dermapen 4) to create thousands of micro-channels in the epidermis. This triggers the skin's natural repair mechanisms and allows deep absorption of medical-grade growth factors, smoothing out large pores and rough textures.",
-    duration: "50 mins",
-    price: "Rs. 9,500",
-    image: "/src/assets/images/facial_procedure_1784603091197.jpg",
-    benefits: [
-      "Restructures superficial scars and rough skin textures",
-      "Visibly shrinks dilated, stretched pores",
-      "Boosts natural elastin and collagen synthesis safely",
-      "Infuses cell-regenerating growth factor serums deep into the dermis"
-    ],
-    procedureSteps: [
-      "Deep facial cleansing and application of anesthetic cream (35 mins)",
-      "Selection of treatment depth customized per facial zone (0.5mm - 2.5mm)",
-      "Systematic pen passes while applying sterile growth factor serum",
-      "Placement of a cooling hyaluronic sheet mask to reduce immediate redness"
-    ],
-    skinTypes: ["All Skin Types", "Combination", "Acne-Scattered", "Dull"],
-    recovery: "Mild sunburn redness and tightness for 24-48 hours. Avoid makeup for 24 hours. Keep hydrated.",
-    faqs: [
-      { q: "Are the needles clean?", a: "We use only single-use, sterile, vacuum-sealed needle cartridges that are opened in front of the patient and discarded immediately after." }
-    ]
-  },
-  {
     id: "laser-rejuvenation",
     name: "Carbon Laser Peel (Hollywood Peel)",
     category: "cosmetic",
@@ -437,7 +220,7 @@ export const TREATMENTS: Treatment[] = [
     fullDescription: "The Hollywood Carbon Laser Peel is a fast, highly effective clinical procedure. A thin layer of liquid carbon is applied to the face, which binds deep inside the pores. The Q-Switched laser is then passed over the skin, vaporizing the carbon particles along with dead cells, sebum, and blackheads instantly.",
     duration: "40 mins",
     price: "Rs. 10,000",
-    image: "/src/assets/images/laser_procedure_1784603065821.jpg",
+    image: "/src/assets/images/med_spa_rejuvenate_hero_1785847414494.jpg",
     benefits: [
       "Delivers instant luminous brightness and uniform skin tone",
       "Shatters deep pigment particles to fade dark spots",
@@ -454,60 +237,6 @@ export const TREATMENTS: Treatment[] = [
     recovery: "Zero downtime. Skin feels incredibly smooth and bright immediately. Perfect pre-party treatment.",
     faqs: [
       { q: "Is the carbon laser peel painful?", a: "No. You will hear a loud popping sound as the laser meets the carbon and feel a mild warm snap. It is painless." }
-    ]
-  },
-  {
-    id: "skin-brightening",
-    name: "Glutathione & Vitamin C Infusion",
-    category: "cosmetic",
-    shortDescription: "Premium antioxidant infusions to detoxify skin, brighten complexions, and reduce melanin synthesis.",
-    fullDescription: "Our skin-brightening infusion features medical-grade glutathione (a powerful antioxidant) combined with high-dose Vitamin C. Administered intravenously under strict clinical supervision, it neutralizes free radicals and inhibits the tyrosinase enzyme to promote overall skin glow.",
-    duration: "45 mins",
-    price: "Rs. 12,000",
-    image: "/src/assets/images/skincare_vanity_1784603112992.jpg",
-    benefits: [
-      "Brightens skin color and fades dark spots across the entire body",
-      "Improves liver detoxification and cellular vitality",
-      "Neutralizes heavy oxidative stress from air pollution and UV light",
-      "Promotes a healthy, radiant, glowing complexion"
-    ],
-    procedureSteps: [
-      "Clinical evaluation of medical history, blood pressure, and kidney markers",
-      "Custom formulation of sterile antioxidants in a saline drip",
-      "Slow, comfortable IV administration in a relaxing private suite (30 mins)",
-      "Post-infusion monitoring and hydration guidance"
-    ],
-    skinTypes: ["All Skin Types", "Dull", "Hyperpigmented"],
-    recovery: "Zero downtime. Resume all daily tasks immediately.",
-    faqs: [
-      { q: "How many sessions are recommended for visible glow?", a: "Most patients notice systemic skin hydration and clarity after 4 to 6 weekly sessions." }
-    ]
-  },
-  {
-    id: "anti-aging-hifu",
-    name: "HIFU Non-Surgical Facelift",
-    category: "cosmetic",
-    shortDescription: "High-Intensity Focused Ultrasound (HIFU) to lift, sculpt, and tighten sagging jawlines and neck skin.",
-    fullDescription: "HIFU is an advanced, non-invasive cosmetic treatment. It delivers highly focused ultrasound waves deep into the SMAS layer (the structural muscle layer targeted during surgical facelifts). This triggers localized thermal coagulation, resulting in immediate tightening and a dramatic collagen lift.",
-    duration: "75 mins",
-    price: "Rs. 30,000",
-    image: "/src/assets/images/laser_procedure_1784603065821.jpg",
-    benefits: [
-      "Drastically tightens sagging neck skin (turkey neck) and double chins",
-      "Lifts drooping brow areas and sharpens soft jawlines",
-      "Requires absolutely zero needles, cuts, or surgical stitching",
-      "Results continue to improve for 3 months as collagen rebuilds"
-    ],
-    procedureSteps: [
-      "Facial assessment and clinical marking of target vector pathways",
-      "Application of medical conductive ultrasound gel",
-      "Systematic delivery of focused ultrasound pulses at 3.0mm and 4.5mm depths",
-      "Post-treatment soothing massage and cold compress placement"
-    ],
-    skinTypes: ["Mature", "Normal", "Dry", "Combination"],
-    recovery: "Zero downtime. Minor muscle tenderness or light swelling may persist for 2-3 days under the jawline.",
-    faqs: [
-      { q: "How many HIFU sessions do I need?", a: "Just one single session can deliver amazing results that last between 12 to 18 months." }
     ]
   },
 
@@ -548,7 +277,7 @@ export const TREATMENTS: Treatment[] = [
     fullDescription: "PRP is a natural medical therapy that utilizes the healing power of your own blood platelets. We draw a small sample of your blood, place it in a high-speed centrifuge to isolate the platelets, and inject the concentrated growth factors into thinning areas of the scalp, reviving dormant hair follicles.",
     duration: "45 mins",
     price: "Rs. 9,000",
-    image: "/src/assets/images/dr_ahmed_dermatologist_1784604001974.jpg",
+    image: "/src/assets/images/dermatology_editorial_hero_1784620875245.jpg",
     benefits: [
       "Substantially reverses hair thinning and strengthens weak follicles",
       "100% natural and safe with zero risk of allergic reactions",
@@ -568,33 +297,6 @@ export const TREATMENTS: Treatment[] = [
     ]
   },
   {
-    id: "scalp-analysis",
-    name: "Trichoscopy Scalp Analysis",
-    category: "hair",
-    shortDescription: "High-definition video trichoscopy to analyze scalp health, sebum build-up, and hair density.",
-    fullDescription: "A healthy scalp is the foundation of thick hair. Utilizing a high-resolution, computerized trichoscope that magnifies the scalp up to 200 times, we analyze sebum congestion, hair follicle grouping, dry scaling, and scalp circulation.",
-    duration: "30 mins",
-    price: "Rs. 3,000",
-    image: "/src/assets/images/dr_ahmed_dermatologist_1784604001974.jpg",
-    benefits: [
-      "Provides clear visual evidence of scalp health and follicle blockage",
-      "Differentiates between various forms of hair loss with high accuracy",
-      "Identifies fungal, bacterial, or inflammatory scalp issues early",
-      "Enables precise tracking of follicle density improvements"
-    ],
-    procedureSteps: [
-      "Sectioning of the scalp into key reference areas",
-      "Scanning with a high-definition polarization trichoscope camera",
-      "Analysis of follicle density and shaft thickness measurements",
-      "Creation of a personalized scalp-cleansing and care plan"
-    ],
-    skinTypes: ["All Skin Types"],
-    recovery: "None. Totally non-invasive digital scan.",
-    faqs: [
-      { q: "Is a scalp scan necessary before PRP?", a: "Yes. Understanding your follicle viability ensures that PRP will be highly effective for your specific condition." }
-    ]
-  },
-  {
     id: "hair-restoration-transplant",
     name: "Micro-FUE Hair Restoration",
     category: "hair",
@@ -602,7 +304,7 @@ export const TREATMENTS: Treatment[] = [
     fullDescription: "For advanced hair loss, Micro-FUE transplantation is the gold standard. Led by Dr. Faisal Ahmed, our surgical team extracts individual healthy hair grafts from the donor area (back of head) and implants them into thinning areas with natural angles and maximum density, guaranteeing permanent, lifelong growth.",
     duration: "300 mins",
     price: "Rs. 95,000",
-    image: "/src/assets/images/dr_ahmed_dermatologist_1784604001974.jpg",
+    image: "/src/assets/images/clinical_hero_1784603046671.jpg",
     benefits: [
       "Permanently restores receding hair lines and balding crowns",
       "Grows completely natural-looking hair that can be cut, washed, and styled",

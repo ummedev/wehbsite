@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { TREATMENTS, CLINIC_INFO } from '../data';
 import { Appointment } from '../types';
-import { Calendar as CalendarIcon, Clock, User, Phone, Mail, FileText, CheckCircle2, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
+import { Clock, User, Phone, Mail, FileText, CheckCircle2, ChevronRight, ChevronLeft, Sparkles, Database } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface BookingFormProps {
   preselectedTreatmentId?: string;
@@ -57,10 +58,6 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
     return dates;
   };
 
-  const formatDateLabel = (date: Date) => {
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  };
-
   const formatDateValue = (date: Date) => {
     return date.toISOString().split('T')[0];
   };
@@ -90,13 +87,13 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
     setStep(step - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
     if (!patientName.trim()) newErrors.name = "Full Name is required";
     if (!patientEmail.trim() || !/\S+@\S+\.\S+/.test(patientEmail)) newErrors.email = "Please enter a valid email address";
-    if (!patientPhone.trim() || patientPhone.length < 9) newErrors.phone = "Please enter a valid Pakistani phone number";
+    if (!patientPhone.trim() || patientPhone.length < 9) newErrors.phone = "Please enter a valid phone number";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -104,7 +101,7 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
     }
 
     const newAppointment: Appointment = {
-      id: `DOC-${Math.floor(100000 + Math.random() * 900000)}`,
+      id: `LUM-${Math.floor(100000 + Math.random() * 900000)}`,
       patientName,
       patientEmail,
       patientPhone,
@@ -117,11 +114,56 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
       createdAt: new Date().toISOString()
     };
 
-    // Save appointment list to localStorage
+    // Save appointment list to localStorage for offline fallback
     const saved = localStorage.getItem('docplus_appointments');
     const list = saved ? JSON.parse(saved) : [];
     list.unshift(newAppointment);
     localStorage.setItem('docplus_appointments', JSON.stringify(list));
+
+    // Save directly to Supabase Database if configured
+    if (isSupabaseConfigured()) {
+      try {
+        const { error: sbError } = await supabase
+          .from('appointments')
+          .insert([
+            {
+              patient_name: patientName,
+              patient_email: patientEmail,
+              patient_phone: patientPhone,
+              treatment_id: treatmentId,
+              treatment_name: activeTreatment?.name || 'General Consultation',
+              date: selectedDate,
+              time: selectedTime,
+              notes: notes || '',
+              status: 'confirmed',
+            },
+          ]);
+        if (sbError) {
+          console.warn('Supabase DB save note (tables auto-created when script is executed):', sbError.message);
+        }
+      } catch (sbErr) {
+        console.warn('Supabase DB save error:', sbErr);
+      }
+    }
+
+    // Save directly to Cloud SQL Database via API endpoint
+    try {
+      await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          patientName,
+          phone: patientPhone,
+          treatmentId,
+          treatmentName: activeTreatment?.name || 'General Consultation',
+          date: selectedDate,
+          time: selectedTime,
+          notes,
+        }),
+      });
+    } catch (err) {
+      console.warn('Backend Cloud SQL save notice:', err);
+    }
 
     // Success state
     setSuccessBooking(newAppointment);
@@ -145,73 +187,75 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
     return (
       <div 
         id="booking-success-card"
-        className="bg-white rounded-2xl border border-[#A8C3A0]/50 p-8 text-center max-w-2xl mx-auto shadow-lg animate-fade-in"
+        className="bg-white rounded-[24px] border border-[#E5E7EB] p-8 text-center max-w-2xl mx-auto shadow-xl animate-fade-in space-y-6"
       >
-        <div className="w-16 h-16 rounded-full bg-[#A8C3A0]/20 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10 text-[#A8C3A0]" />
+        <div className="w-16 h-16 rounded-full bg-[#F0F6FF] flex items-center justify-center mx-auto text-[#2D6CDF]">
+          <CheckCircle2 className="w-10 h-10 text-[#2D6CDF]" />
         </div>
-        <span className="inline-block px-3 py-1 rounded-full text-[10px] font-mono tracking-widest bg-[#FAF8F8] border border-[#F6D6D8] uppercase text-[#2E2E2E]/60 mb-2">
-          Appointment Confirmed
-        </span>
-        <h3 className="text-2xl font-display font-semibold text-[#2E2E2E] mb-2">
-          Your Booking is Successful!
-        </h3>
-        <p className="text-sm text-[#2E2E2E]/70 mb-6">
-          Thank you for choosing Doc+ Dermatology. A confirmation SMS and email summary has been dispatched.
-        </p>
+        <div>
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-[#F0F6FF] text-[#2D6CDF] uppercase tracking-wider mb-2">
+            Appointment Confirmed
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-display font-bold text-[#1F2937]">
+            Your Booking is Successful!
+          </h3>
+          <p className="text-sm text-[#6B7280] mt-1">
+            Thank you for choosing Doc+ Dermatology. A confirmation summary has been dispatched.
+          </p>
+        </div>
 
         {/* Appointment Details summary board */}
-        <div className="bg-[#FAF8F8] rounded-xl border border-[#F6D6D8]/20 p-5 text-left space-y-3 mb-6">
-          <div className="flex justify-between items-center text-xs border-b border-[#F6D6D8]/20 pb-2">
-            <span className="text-[#2E2E2E]/60 font-mono">Reference Code:</span>
-            <span className="font-mono font-bold text-slate-800">{successBooking.id}</span>
+        <div className="bg-[#FAFBFC] rounded-2xl border border-[#E5E7EB] p-6 text-left space-y-3">
+          <div className="flex justify-between items-center text-xs border-b border-[#E5E7EB] pb-2">
+            <span className="text-[#6B7280]">Reference Code:</span>
+            <span className="font-bold text-[#1F2937]">{successBooking.id}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[#2E2E2E]/60">Patient Name:</span>
-            <span className="font-medium text-[#2E2E2E]">{successBooking.patientName}</span>
+            <span className="text-[#6B7280]">Patient Name:</span>
+            <span className="font-bold text-[#1F2937]">{successBooking.patientName}</span>
           </div>
           {successBooking.doctorName && (
             <div className="flex justify-between items-center text-xs">
-              <span className="text-[#2E2E2E]/60">Assigned Consultant:</span>
-              <span className="font-medium text-[#2E2E2E]">{successBooking.doctorName}</span>
+              <span className="text-[#6B7280]">Assigned Specialist:</span>
+              <span className="font-bold text-[#1F2937]">{successBooking.doctorName}</span>
             </div>
           )}
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[#2E2E2E]/60">Procedure Scheduled:</span>
-            <span className="font-medium text-[#A8C3A0]">{activeTreatment.name}</span>
+            <span className="text-[#6B7280]">Procedure Scheduled:</span>
+            <span className="font-bold text-[#2D6CDF]">{activeTreatment.name}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[#2E2E2E]/60">Date & Timing:</span>
-            <span className="font-medium text-[#2E2E2E]">
+            <span className="text-[#6B7280]">Date & Timing:</span>
+            <span className="font-bold text-[#1F2937]">
               {new Date(successBooking.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} at {successBooking.time}
             </span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-[#2E2E2E]/60">Cost of Service:</span>
-            <span className="font-bold text-[#2E2E2E]">{activeTreatment.price}</span>
+            <span className="text-[#6B7280]">Service Fee:</span>
+            <span className="font-extrabold text-[#1F2937]">{activeTreatment.price}</span>
           </div>
         </div>
 
-        <div className="bg-[#F6D6D8]/20 rounded-lg p-4 border border-[#F6D6D8]/40 mb-8 text-xs text-left text-[#2E2E2E]/80">
-          <p className="font-semibold mb-1">Clinic Policy & Instructions:</p>
-          <ul className="list-disc pl-4 space-y-1 text-[11px] text-[#2E2E2E]/70">
+        <div className="bg-[#F0F6FF] rounded-xl p-4 border border-[#2D6CDF]/20 text-xs text-left text-[#1F2937]">
+          <p className="font-bold mb-1">Clinic Guidelines:</p>
+          <ul className="list-disc pl-4 space-y-1 text-xs text-[#6B7280]">
             <li>Please arrive 10 minutes prior to your slot for skin prep and scanning.</li>
-            <li>In case of cancellations or rescheduling, please notify us at least 4 hours in advance at <span className="font-mono font-bold text-slate-700">+92 309 7823058</span>.</li>
+            <li>In case of cancellations or rescheduling, please notify us at least 4 hours in advance at <span className="font-bold text-[#1F2937]">+92 309 7823058</span>.</li>
           </ul>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <button
             id="btn-book-another"
             onClick={handleReset}
-            className="px-6 py-2.5 rounded-full border border-[#F6D6D8] hover:bg-[#FAF8F8] text-xs font-semibold text-[#2E2E2E] transition-all"
+            className="px-6 py-3 rounded-xl border border-[#E5E7EB] hover:bg-gray-50 text-xs font-bold text-[#1F2937] transition-all"
           >
             Schedule Another Appointment
           </button>
           <button
             id="btn-print-summary"
             onClick={() => window.print()}
-            className="px-6 py-2.5 rounded-full bg-[#2E2E2E] hover:bg-[#3E3E3E] text-xs font-semibold text-white transition-all shadow-md"
+            className="px-6 py-3 rounded-xl bg-[#2D6CDF] hover:bg-[#1D4ED8] text-xs font-bold text-white transition-all shadow-md"
           >
             Download Summary Receipts
           </button>
@@ -221,19 +265,19 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#F6D6D8]/30 overflow-hidden shadow-md max-w-3xl mx-auto">
+    <div className="bg-[#FBF9F5] rounded-[32px] border border-[#E5DFD5] overflow-hidden shadow-xl max-w-3xl mx-auto text-[#1C1917]">
       {/* Step Header Indicator */}
-      <div className="bg-[#FAF8F8] border-b border-[#F6D6D8]/20 px-6 py-4 flex justify-between items-center">
+      <div className="bg-[#1A3121] border-b border-[#C5A880]/30 px-6 py-5 flex justify-between items-center text-white">
         <div>
-          <h3 className="text-lg font-display font-semibold text-[#2E2E2E]">In-Clinic Session Scheduler</h3>
-          <p className="text-xs text-[#2E2E2E]/60">Doc+ Dermatology Lyallpur Galleria, Faisalabad</p>
+          <h3 className="text-xl font-serif text-white">Session Reservation</h3>
+          <p className="text-xs text-[#EAE4DC]">LUMÉA Skin Sanctuary, Lyallpur Galleria, Faisalabad</p>
         </div>
-        <div className="flex items-center gap-1.5 font-mono text-xs">
-          <span className={`px-2 py-1 rounded-md ${step >= 1 ? 'bg-[#F6D6D8] text-[#2E2E2E] font-bold' : 'bg-gray-100 text-gray-400'}`}>1</span>
-          <span className="text-[#F6D6D8]">/</span>
-          <span className={`px-2 py-1 rounded-md ${step >= 2 ? 'bg-[#F6D6D8] text-[#2E2E2E] font-bold' : 'bg-gray-100 text-gray-400'}`}>2</span>
-          <span className="text-[#F6D6D8]">/</span>
-          <span className={`px-2 py-1 rounded-md ${step >= 3 ? 'bg-[#F6D6D8] text-[#2E2E2E] font-bold' : 'bg-gray-100 text-gray-400'}`}>3</span>
+        <div className="flex items-center gap-2 font-bold text-xs">
+          <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-[#C5A880] text-[#122315]' : 'bg-[#122315] text-[#EAE4DC]'}`}>1</span>
+          <span className="text-[#C5A880]">/</span>
+          <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-[#C5A880] text-[#122315]' : 'bg-[#122315] text-[#EAE4DC]'}`}>2</span>
+          <span className="text-[#C5A880]">/</span>
+          <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-[#C5A880] text-[#122315]' : 'bg-[#122315] text-[#EAE4DC]'}`}>3</span>
         </div>
       </div>
 
@@ -241,7 +285,7 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
         {/* STEP 1: SELECT TREATMENT */}
         {step === 1 && (
           <div className="space-y-6 animate-fade-in">
-            <h4 className="text-sm font-semibold text-[#2E2E2E] uppercase tracking-wider font-mono">
+            <h4 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">
               Step 1: Choose Skin Treatment
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -250,38 +294,38 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                   id={`booking-select-treatment-${treatment.id}`}
                   key={treatment.id}
                   onClick={() => setTreatmentId(treatment.id)}
-                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                     treatmentId === treatment.id
-                      ? 'border-[#A8C3A0] bg-[#A8C3A0]/5 shadow-sm'
-                      : 'border-[#F6D6D8]/30 hover:border-[#F6D6D8] bg-white'
+                      ? 'border-[#2D6CDF] bg-[#F0F6FF] shadow-sm'
+                      : 'border-[#E5E7EB] hover:border-gray-300 bg-white'
                   }`}
                 >
                   <div className="flex justify-between items-start gap-2">
-                    <span className="text-xs font-mono tracking-wider font-semibold text-[#A8C3A0] uppercase bg-[#FAF8F8] px-2 py-0.5 rounded-md border border-[#F6D6D8]/20">
+                    <span className="text-[10px] uppercase font-bold text-[#2D6CDF] bg-white px-2 py-0.5 rounded-md border border-[#E5E7EB]">
                       {treatment.category}
                     </span>
-                    <span className="text-xs font-bold text-[#2E2E2E]">{treatment.price}</span>
+                    <span className="text-xs font-extrabold text-[#1F2937]">{treatment.price}</span>
                   </div>
-                  <h5 className="font-semibold text-[#2E2E2E] text-sm mt-3">{treatment.name}</h5>
-                  <p className="text-[11px] text-[#2E2E2E]/60 mt-1 line-clamp-2">
+                  <h5 className="font-bold text-[#1F2937] text-sm mt-3">{treatment.name}</h5>
+                  <p className="text-xs text-[#6B7280] mt-1 line-clamp-2 leading-relaxed">
                     {treatment.shortDescription}
                   </p>
-                  <div className="flex items-center gap-1 text-[10px] text-[#2E2E2E]/70 mt-3">
-                    <Clock className="w-3 h-3 text-[#A8C3A0]" />
+                  <div className="flex items-center gap-1 text-xs text-[#6B7280] mt-3">
+                    <Clock className="w-3.5 h-3.5 text-[#2D6CDF]" />
                     <span>Duration: {treatment.duration}</span>
                   </div>
                 </div>
               ))}
             </div>
-            {errors.treatment && <p className="text-xs text-red-500">{errors.treatment}</p>}
+            {errors.treatment && <p className="text-xs text-red-500 font-bold">{errors.treatment}</p>}
 
-            <div className="flex justify-end pt-4 border-t border-[#F6D6D8]/10">
+            <div className="flex justify-end pt-4 border-t border-[#E5E7EB]">
               <button
                 id="btn-step1-next"
                 onClick={handleNextStep}
-                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-xs font-semibold bg-[#2E2E2E] hover:bg-[#3E3E3E] text-white transition-all shadow-md"
+                className="inline-flex items-center gap-1.5 px-6 py-3 rounded-xl text-xs font-bold bg-[#2D6CDF] hover:bg-[#1D4ED8] text-white transition-all shadow-md"
               >
-                Choose Date & Time <ChevronRight className="w-3.5 h-3.5" />
+                Choose Date & Time <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -291,15 +335,15 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
         {step === 2 && (
           <div className="space-y-6 animate-fade-in">
             <div>
-              <h4 className="text-sm font-semibold text-[#2E2E2E] uppercase tracking-wider font-mono mb-1">
+              <h4 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-1">
                 Step 2: Schedule Timing
               </h4>
-              <p className="text-[11px] text-[#2E2E2E]/60">Select from open slots (Clinic timings: Mon-Sat 11:00 AM - 08:00 PM)</p>
+              <p className="text-xs text-[#6B7280]">Select from open slots (Clinic timings: Mon-Sat 11:00 AM - 08:00 PM)</p>
             </div>
 
             {/* Interactive Calendar Slots Grid */}
             <div className="space-y-3">
-              <label className="block text-xs font-semibold text-[#2E2E2E]">Available Days (Next 2 Weeks)</label>
+              <label className="block text-xs font-bold text-[#1F2937]">Available Days (Next 2 Weeks)</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {getNextTwoWeeks().map((date) => {
                   const val = formatDateValue(date);
@@ -313,28 +357,28 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                         setSelectedDate(val);
                         setErrors(prev => ({ ...prev, date: "" }));
                       }}
-                      className={`p-3 rounded-lg border text-center transition-all ${
+                      className={`p-3 rounded-xl border text-center transition-all ${
                         isSelected 
-                          ? 'border-[#A8C3A0] bg-[#A8C3A0] text-white font-semibold' 
-                          : 'border-[#F6D6D8]/20 bg-white hover:border-[#F6D6D8] text-xs'
+                          ? 'border-[#2D6CDF] bg-[#2D6CDF] text-white font-bold' 
+                          : 'border-[#E5E7EB] bg-white hover:bg-gray-50 text-xs text-[#1F2937]'
                       }`}
                     >
-                      <span className="block text-[10px] uppercase tracking-wider opacity-90">
+                      <span className="block text-[10px] uppercase tracking-wider opacity-80">
                         {date.toLocaleDateString('en-US', { weekday: 'short' })}
                       </span>
-                      <span className="block text-sm font-semibold mt-0.5">
+                      <span className="block text-sm font-bold mt-0.5">
                         {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </span>
                     </button>
                   );
                 })}
               </div>
-              {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date}</p>}
+              {errors.date && <p className="text-xs text-red-500 font-bold mt-1">{errors.date}</p>}
             </div>
 
             {/* Interactive Time Slots Grid */}
             <div className="space-y-3 pt-3">
-              <label className="block text-xs font-semibold text-[#2E2E2E]">Available Time Slots</label>
+              <label className="block text-xs font-bold text-[#1F2937]">Available Time Slots</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {TIME_SLOTS.map((time) => {
                   const isSelected = selectedTime === time;
@@ -347,10 +391,10 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                         setSelectedTime(time);
                         setErrors(prev => ({ ...prev, time: "" }));
                       }}
-                      className={`py-2 px-1 rounded-lg border text-xs text-center transition-all ${
+                      className={`py-2.5 px-1 rounded-xl border text-xs text-center transition-all ${
                         isSelected 
-                          ? 'border-[#A8C3A0] bg-[#A8C3A0]/10 text-[#2E2E2E] font-bold border-2' 
-                          : 'border-[#F6D6D8]/20 bg-white hover:border-[#F6D6D8]'
+                          ? 'border-[#2D6CDF] bg-[#F0F6FF] text-[#2D6CDF] font-bold border-2' 
+                          : 'border-[#E5E7EB] bg-white hover:bg-gray-50 text-[#1F2937]'
                       }`}
                     >
                       {time}
@@ -358,23 +402,23 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                   );
                 })}
               </div>
-              {errors.time && <p className="text-xs text-red-500 mt-1">{errors.time}</p>}
+              {errors.time && <p className="text-xs text-red-500 font-bold mt-1">{errors.time}</p>}
             </div>
 
-            <div className="flex justify-between pt-6 border-t border-[#F6D6D8]/10 mt-6">
+            <div className="flex justify-between pt-6 border-t border-[#E5E7EB] mt-6">
               <button
                 id="btn-step2-prev"
                 onClick={handlePrevStep}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-[#F6D6D8] hover:bg-[#FAF8F8] text-xs font-semibold text-[#2E2E2E] transition-all"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-[#E5E7EB] hover:bg-gray-50 text-xs font-bold text-[#1F2937] transition-all"
               >
-                <ChevronLeft className="w-3.5 h-3.5" /> Back
+                <ChevronLeft className="w-4 h-4" /> Back
               </button>
               <button
                 id="btn-step2-next"
                 onClick={handleNextStep}
-                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-full text-xs font-semibold bg-[#2E2E2E] hover:bg-[#3E3E3E] text-white transition-all shadow-md"
+                className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-bold bg-[#2D6CDF] hover:bg-[#1D4ED8] text-white transition-all shadow-md"
               >
-                Enter Personal Details <ChevronRight className="w-3.5 h-3.5" />
+                Enter Personal Details <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -383,28 +427,28 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
         {/* STEP 3: PERSONAL INFORMATION & NOTES */}
         {step === 3 && (
           <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
-            <h4 className="text-sm font-semibold text-[#2E2E2E] uppercase tracking-wider font-mono">
+            <h4 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">
               Step 3: Patient Information
             </h4>
 
             {/* Quick alert if logged in */}
             {patientProfile && (
-              <div className="bg-[#A8C3A0]/10 border border-[#A8C3A0]/30 rounded-lg p-3 text-xs text-[#2E2E2E]/80 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#A8C3A0] shrink-0" />
+              <div className="bg-[#F0F6FF] border border-[#2D6CDF]/30 rounded-xl p-3.5 text-xs text-[#1F2937] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#2D6CDF] shrink-0" />
                 <span>You are logged in. We've automatically filled in your profile coordinates.</span>
               </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-xs font-semibold text-[#2E2E2E] flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#A8C3A0]" /> Preferred Consultant Specialist
+                <label className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <User className="w-4 h-4 text-[#2D6CDF]" /> Preferred Specialist
                 </label>
                 <select
                   id="booking-select-doctor"
                   value={doctorName}
                   onChange={(e) => setDoctorName(e.target.value)}
-                  className="w-full text-xs rounded-lg border border-[#F6D6D8]/40 p-3 bg-white focus:outline-hidden focus:border-[#A8C3A0]"
+                  className="w-full text-xs rounded-xl border border-[#E5E7EB] p-3.5 bg-white focus:outline-hidden focus:border-[#2D6CDF]"
                 >
                   {CLINIC_INFO.doctors.map((doc) => (
                     <option key={doc.id} value={doc.name}>
@@ -415,8 +459,8 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#2E2E2E] flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#A8C3A0]" /> Full Name
+                <label className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <User className="w-4 h-4 text-[#2D6CDF]" /> Full Name
                 </label>
                 <input
                   id="booking-input-name"
@@ -427,14 +471,14 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                     if (errors.name) setErrors(prev => ({ ...prev, name: "" }));
                   }}
                   placeholder="e.g. Zainab Fatima"
-                  className="w-full text-xs rounded-lg border border-[#F6D6D8]/40 p-3 focus:outline-hidden focus:border-[#A8C3A0] focus:ring-1 focus:ring-[#A8C3A0]"
+                  className="w-full text-xs rounded-xl border border-[#E5E7EB] p-3.5 focus:outline-hidden focus:border-[#2D6CDF]"
                 />
-                {errors.name && <p className="text-[10px] text-red-500">{errors.name}</p>}
+                {errors.name && <p className="text-xs text-red-500 font-bold">{errors.name}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#2E2E2E] flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-[#A8C3A0]" /> Email Address
+                <label className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <Mail className="w-4 h-4 text-[#2D6CDF]" /> Email Address
                 </label>
                 <input
                   id="booking-input-email"
@@ -445,14 +489,14 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                     if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
                   }}
                   placeholder="e.g. contact@domain.com"
-                  className="w-full text-xs rounded-lg border border-[#F6D6D8]/40 p-3 focus:outline-hidden focus:border-[#A8C3A0]"
+                  className="w-full text-xs rounded-xl border border-[#E5E7EB] p-3.5 focus:outline-hidden focus:border-[#2D6CDF]"
                 />
-                {errors.email && <p className="text-[10px] text-red-500">{errors.email}</p>}
+                {errors.email && <p className="text-xs text-red-500 font-bold">{errors.email}</p>}
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-xs font-semibold text-[#2E2E2E] flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-[#A8C3A0]" /> Contact Mobile (Pakistan)
+                <label className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <Phone className="w-4 h-4 text-[#2D6CDF]" /> Contact Mobile Number
                 </label>
                 <input
                   id="booking-input-phone"
@@ -463,14 +507,14 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                     if (errors.phone) setErrors(prev => ({ ...prev, phone: "" }));
                   }}
                   placeholder="e.g. +92 309 7823058"
-                  className="w-full text-xs rounded-lg border border-[#F6D6D8]/40 p-3 focus:outline-hidden focus:border-[#A8C3A0]"
+                  className="w-full text-xs rounded-xl border border-[#E5E7EB] p-3.5 focus:outline-hidden focus:border-[#2D6CDF]"
                 />
-                {errors.phone && <p className="text-[10px] text-red-500">{errors.phone}</p>}
+                {errors.phone && <p className="text-xs text-red-500 font-bold">{errors.phone}</p>}
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="text-xs font-semibold text-[#2E2E2E] flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-[#A8C3A0]" /> Skin Concerns & Pre-existing Allergies
+                <label className="text-xs font-bold text-[#1F2937] flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-[#2D6CDF]" /> Skin Concerns & Notes
                 </label>
                 <textarea
                   id="booking-input-notes"
@@ -478,44 +522,44 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Describe your active concerns (e.g., severe flareups, scarring, sensitivity to peels)"
-                  className="w-full text-xs rounded-lg border border-[#F6D6D8]/40 p-3 focus:outline-hidden focus:border-[#A8C3A0]"
+                  className="w-full text-xs rounded-xl border border-[#E5E7EB] p-3.5 focus:outline-hidden focus:border-[#2D6CDF]"
                 />
               </div>
             </div>
 
-            <div className="bg-[#FAF8F8] border border-[#F6D6D8]/20 rounded-xl p-4 mt-6">
-              <h5 className="text-xs font-semibold text-[#2E2E2E] mb-2 font-mono uppercase">Reservation Summary</h5>
-              <div className="grid grid-cols-2 gap-y-1.5 text-[11px] text-[#2E2E2E]/80">
-                <span>Preferred Doctor:</span>
-                <span className="font-semibold text-right">{doctorName}</span>
-                <span>Treatment:</span>
-                <span className="font-semibold text-right">{activeTreatment?.name}</span>
-                <span>Date Selected:</span>
-                <span className="font-semibold text-right">
+            <div className="bg-[#FAFBFC] border border-[#E5E7EB] rounded-2xl p-4 mt-6">
+              <h5 className="text-xs font-bold text-[#1F2937] mb-2 uppercase tracking-wider">Reservation Summary</h5>
+              <div className="grid grid-cols-2 gap-y-1.5 text-xs text-[#1F2937]">
+                <span className="text-[#6B7280]">Doctor:</span>
+                <span className="font-bold text-right">{doctorName}</span>
+                <span className="text-[#6B7280]">Treatment:</span>
+                <span className="font-bold text-right">{activeTreatment?.name}</span>
+                <span className="text-[#6B7280]">Date Selected:</span>
+                <span className="font-bold text-right">
                   {selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : ""}
                 </span>
-                <span>Appointment Time:</span>
-                <span className="font-semibold text-right">{selectedTime}</span>
-                <span>Fees / Cost:</span>
-                <span className="font-semibold text-right text-[#A8C3A0]">{activeTreatment?.price}</span>
+                <span className="text-[#6B7280]">Time Slot:</span>
+                <span className="font-bold text-right">{selectedTime}</span>
+                <span className="text-[#6B7280]">Fee:</span>
+                <span className="font-bold text-right text-[#2D6CDF]">{activeTreatment?.price}</span>
               </div>
             </div>
 
-            <div className="flex justify-between pt-6 border-t border-[#F6D6D8]/10 mt-6">
+            <div className="flex justify-between pt-6 border-t border-[#E5E7EB] mt-6">
               <button
                 id="btn-step3-prev"
                 type="button"
                 onClick={handlePrevStep}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-[#F6D6D8] hover:bg-[#FAF8F8] text-xs font-semibold text-[#2E2E2E] transition-all"
+                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-[#E5E7EB] hover:bg-gray-50 text-xs font-bold text-[#1F2937] transition-all"
               >
-                <ChevronLeft className="w-3.5 h-3.5" /> Back
+                <ChevronLeft className="w-4 h-4" /> Back
               </button>
               <button
                 id="btn-booking-submit"
                 type="submit"
-                className="inline-flex items-center gap-1.5 px-7 py-3 rounded-full text-xs font-semibold bg-[#2E2E2E] hover:bg-[#3E3E3E] text-[#F6D6D8] transition-all shadow-md hover:shadow-lg"
+                className="inline-flex items-center gap-1.5 px-7 py-3 rounded-xl text-xs font-bold bg-[#2D6CDF] hover:bg-[#1D4ED8] text-white transition-all shadow-md"
               >
-                Confirm Appointment Reservation <CheckCircle2 className="w-4 h-4 text-[#F6D6D8]" />
+                Confirm Reservation <CheckCircle2 className="w-4 h-4" />
               </button>
             </div>
           </form>
@@ -524,3 +568,4 @@ export default function BookingForm({ preselectedTreatmentId, onBookingComplete,
     </div>
   );
 }
+
